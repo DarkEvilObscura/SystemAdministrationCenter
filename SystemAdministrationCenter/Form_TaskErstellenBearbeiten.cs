@@ -163,6 +163,8 @@ namespace SystemAdministrationCenter
 
             task.StatusText = TaskErstellenBearbeiten.StatusTyp.NochNichtAusgefuehrt;
             task.RunOnce = checkBox_RunOnce.Checked;
+            task.NoWindow = checkBox_NoWindow.Checked;
+            task.WindowStyle = (System.Diagnostics.ProcessWindowStyle)comboBox_WindowMode.SelectedIndex;
 
             this.Task = task;
 

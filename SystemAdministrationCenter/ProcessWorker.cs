@@ -17,7 +17,7 @@ namespace SystemAdministrationCenter
         }
 
         public bool Running { get; private set; } = false;
-        public bool Exited { get; private set; } = false;
+        //public bool Exited { get; private set; } = false;
 
         public ProcessWorker(TaskErstellenBearbeiten task)
         {
@@ -26,6 +26,8 @@ namespace SystemAdministrationCenter
 
         public void StartWorker()
         {
+            this.Running = !this.Running;
+            //Exited = false;
             this._backgroundWorker.DoWork += BackgroundWorker_DoWork;
             this._backgroundWorker.RunWorkerAsync(_task);
         }
@@ -36,9 +38,9 @@ namespace SystemAdministrationCenter
             ProcessStartInfo processStartInfo = new ProcessStartInfo()
             {
                 FileName = task.TaskExecution[0].Value,
-                Arguments = task.TaskExecution[1].Value
-                //CreateNoWindow = true,
-                //ProcessWindowStyle.Normal
+                Arguments = task.TaskExecution[1].Value,
+                CreateNoWindow = task.NoWindow,
+                WindowStyle = task.WindowStyle
             };
 
             this._process.StartInfo = processStartInfo;
@@ -57,7 +59,7 @@ namespace SystemAdministrationCenter
 
         private void Process_Exited(object sender, EventArgs e)
         {
-            this.Exited = true;
+            this.Running = !this.Running;
         }
     }
 }
