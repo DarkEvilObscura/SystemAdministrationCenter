@@ -175,15 +175,6 @@ namespace SystemAdministrationCenter
                     UpdateListViewItemStatus(index, TaskErstellenBearbeiten.StatusTyp.Beendet);
                 }
             }
-            
-            if(listIDs.Count > 0)
-            {
-                listIDs.ForEach(item => {
-                    index = listProcess.FindIndex(x => x.Key == item);
-                    listProcess.RemoveAt(index);
-                });
-                listIDs.Clear();
-            }
         }
 
         void Run(TaskErstellenBearbeiten task)
@@ -225,23 +216,29 @@ namespace SystemAdministrationCenter
             if(listView_Tasks.SelectedItems.Count>0)
             {
                 selectedIndex = listView_Tasks.SelectedIndices[0];
-                //Wenn ein Element im ListView ausgewählt wurde
-                switch (listTasks[selectedIndex].StatusText)
-                {
-                    case TaskErstellenBearbeiten.StatusTyp.NochNichtAusgefuehrt:
-                    case TaskErstellenBearbeiten.StatusTyp.Beendet:
-                        AddContextMenuItem(contextMenuStrip, "TaskStart", "Task starten", toolStripMenuItem_TaskStart_Click);
-                        break;
-                    case TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt:
-                        AddContextMenuItem(contextMenuStrip, "TaskKill", "Task beenden", toolStripMenuItem_TaskKill_Click);
-                        break;
-                }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                bool enabled = (listView_Tasks.Items.Count > 0);
+                toolStripMenuItem_TaskBearbeiten.Enabled = enabled;
+                toolStripMenuItem_TaskLoeschen.Enabled = enabled;
             }
 
-            AddContextSeparator(contextMenuStrip);
+            //Wenn ein Element im ListView ausgewählt wurde
+            if(selectedIndex > -1)
+            {
+                contextMenuStrip.Items.Clear();
+                AddContextMenuItem(contextMenuStrip, "TaskStart", "Task starten", blub);
+                ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem();
+                toolStripMenuItem.Name = "toolStripMenuItem_Blub";
+                toolStripMenuItem.Text = "Blub";
+                toolStripMenuItem.Click += new EventHandler(blub);
+                contextMenuStrip.Items.Add(toolStripMenuItem);
+            }
+        }
 
-            AddContextMenuItem(contextMenuStrip, "TaskBearbeiten", "Task bearbeiten", toolStripMenuItem_TaskBearbeiten_Click);
-            AddContextMenuItem(contextMenuStrip, "TaskLoeschen", "Task löschen", toolStripMenuItem_TaskLoeschen_Click);
+        void blub(object sender, EventArgs e)
+        {
 
             bool enabled = (listView_Tasks.Items.Count > 0);
             toolStripMenuItem_TaskBearbeiten.Enabled = enabled;
@@ -278,18 +275,6 @@ namespace SystemAdministrationCenter
                 contextMenuStrip.Items.Remove(contextMenuStrip.Items.Find(name, true)[0]);
             }
             catch (IndexOutOfRangeException) { }
-        }
-
-        void toolStripMenuItem_TaskStart_Click(object sender, EventArgs e)
-        {
-            int selectedIndex = listView_Tasks.SelectedIndices[0];
-            Run(listTasks[selectedIndex]);
-        }
-
-        void toolStripMenuItem_TaskKill_Click(object sender, EventArgs e)
-        {
-            int selectedIndex = listView_Tasks.SelectedIndices[0];
-            Kill(listLVItems[selectedIndex].Key);
         }
     }
 }
