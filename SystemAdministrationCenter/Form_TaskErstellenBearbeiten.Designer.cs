@@ -30,6 +30,8 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.comboBox_WindowMode = new System.Windows.Forms.ComboBox();
+            this.checkBox_NoWindow = new System.Windows.Forms.CheckBox();
             this.checkBox_RunOnce = new System.Windows.Forms.CheckBox();
             this.dateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.textBox_FileParameter = new System.Windows.Forms.TextBox();
@@ -40,8 +42,6 @@
             this.button_Apply = new System.Windows.Forms.Button();
             this.button_Cancel = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.checkBox_NoWindow = new System.Windows.Forms.CheckBox();
-            this.comboBox_WindowMode = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -62,6 +62,32 @@
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Task";
+            // 
+            // comboBox_WindowMode
+            // 
+            this.comboBox_WindowMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_WindowMode.FormattingEnabled = true;
+            this.comboBox_WindowMode.Items.AddRange(new object[] {
+            "Normal",
+            "Ausgeblendet",
+            "Maximiert",
+            "Minimiert"});
+            this.comboBox_WindowMode.Location = new System.Drawing.Point(175, 122);
+            this.comboBox_WindowMode.Name = "comboBox_WindowMode";
+            this.comboBox_WindowMode.Size = new System.Drawing.Size(121, 21);
+            this.comboBox_WindowMode.TabIndex = 9;
+            this.comboBox_WindowMode.SelectedIndexChanged += new System.EventHandler(this.comboBox_WindowMode_SelectedIndexChanged);
+            // 
+            // checkBox_NoWindow
+            // 
+            this.checkBox_NoWindow.AutoSize = true;
+            this.checkBox_NoWindow.Location = new System.Drawing.Point(6, 124);
+            this.checkBox_NoWindow.Name = "checkBox_NoWindow";
+            this.checkBox_NoWindow.Size = new System.Drawing.Size(145, 17);
+            this.checkBox_NoWindow.TabIndex = 8;
+            this.checkBox_NoWindow.Text = "Im Hintergrund ausführen";
+            this.checkBox_NoWindow.UseVisualStyleBackColor = true;
+            this.checkBox_NoWindow.CheckedChanged += new System.EventHandler(this.checkBox_NoWindow_CheckedChanged);
             // 
             // checkBox_RunOnce
             // 
@@ -164,30 +190,6 @@
             this.button_Cancel.Text = "Abbrechen";
             this.button_Cancel.UseVisualStyleBackColor = true;
             this.button_Cancel.Click += new System.EventHandler(this.button_Cancel_Click);
-            // 
-            // checkBox_NoWindow
-            // 
-            this.checkBox_NoWindow.AutoSize = true;
-            this.checkBox_NoWindow.Location = new System.Drawing.Point(6, 124);
-            this.checkBox_NoWindow.Name = "checkBox_NoWindow";
-            this.checkBox_NoWindow.Size = new System.Drawing.Size(145, 17);
-            this.checkBox_NoWindow.TabIndex = 8;
-            this.checkBox_NoWindow.Text = "Im Hintergrund ausführen";
-            this.checkBox_NoWindow.UseVisualStyleBackColor = true;
-            this.checkBox_NoWindow.CheckedChanged += new System.EventHandler(this.checkBox_NoWindow_CheckedChanged);
-            // 
-            // comboBox_WindowMode
-            // 
-            this.comboBox_WindowMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox_WindowMode.FormattingEnabled = true;
-            this.comboBox_WindowMode.Items.AddRange(new object[] {
-            "Normal",
-            "Maximiert",
-            "Minimiert"});
-            this.comboBox_WindowMode.Location = new System.Drawing.Point(175, 122);
-            this.comboBox_WindowMode.Name = "comboBox_WindowMode";
-            this.comboBox_WindowMode.Size = new System.Drawing.Size(121, 21);
-            this.comboBox_WindowMode.TabIndex = 9;
             // 
             // Form_TaskErstellenBearbeiten
             // 

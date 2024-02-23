@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -52,8 +53,6 @@ namespace SystemAdministrationCenter
             columnHeader_Condition.Width = width;
             columnHeader_Execution.Width = width;
             columnHeader_Status.Width = width;
-
-            //SendMessage(this.toolStripComboBox_Action.Control.Handle, CB_SETCUEBANNER, 0, "Task-Aktion");
         }
 
         private void toolStripMenuItem_NeuenTask_Click(object sender, EventArgs e)
@@ -87,6 +86,11 @@ namespace SystemAdministrationCenter
                 this.listLVItems[index] = new KeyValuePair<int, ListViewItem>(index, listViewItem);
                 listView_Tasks.Items[index] = listViewItem;
             }
+        }
+
+        void toolStripMenuItem_TaskLoeschen_Click(object sender, EventArgs e)
+        {
+            //TODO
         }
 
         ListViewItem CreateNewListViewItem(TaskErstellenBearbeiten task)
@@ -148,10 +152,7 @@ namespace SystemAdministrationCenter
                        item.TaskConditionTime.ToShortTimeString() == DateTime.Now.ToShortTimeString() &&
                        item.StatusText == TaskErstellenBearbeiten.StatusTyp.NochNichtAusgefuehrt)
                     {
-                        ProcessWorker processWorker = new ProcessWorker(item);
-                        processWorker.StartWorker();
-                        this.listProcess.Add(new KeyValuePair<int, ProcessWorker>(item.ID, processWorker));
-                        UpdateListViewItemStatus(listLVItems.FindIndex(x => x.Key == item.ID), TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt);
+                        Run(item);
                     }
                 }
 
@@ -163,15 +164,42 @@ namespace SystemAdministrationCenter
         {
             TaskErstellenBearbeiten task;
             int index = 0;
+            List<int> listIDs = new List<int>();
             foreach (KeyValuePair<int, ProcessWorker> item in this.listProcess)
             {
-                if (item.Value.Exited)
+                if (!item.Value.Running)
                 {
+                    listIDs.Add(item.Key);
                     task = (TaskErstellenBearbeiten)item.Value.CurrentObject;
                     index = listLVItems.FindIndex(x => x.Key == task.ID);
                     UpdateListViewItemStatus(index, TaskErstellenBearbeiten.StatusTyp.Beendet);
                 }
             }
+            
+            if(listIDs.Count > 0)
+            {
+                listIDs.ForEach(item => {
+                    index = listProcess.FindIndex(x => x.Key == item);
+                    listProcess.RemoveAt(index);
+                });
+                listIDs.Clear();
+            }
+        }
+
+        void Run(TaskErstellenBearbeiten task)
+        {
+            ProcessWorker processWorker = new ProcessWorker(task);
+            processWorker.StartWorker();
+            this.listProcess.Add(new KeyValuePair<int, ProcessWorker>(task.ID, processWorker));
+            UpdateListViewItemStatus(listLVItems.FindIndex(x => x.Key == task.ID), TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt);
+        }
+
+        void Kill(int taskID)
+        {
+            KeyValuePair<int, ProcessWorker> item = this.listProcess.Find(x => x.Key == taskID);
+            item.Value.KillProcess();
+            this.listProcess.Remove(item);
+            UpdateListViewItemStatus(listLVItems.FindIndex(x => x.Key == taskID), TaskErstellenBearbeiten.StatusTyp.Beendet);
         }
 
         string GetStatusText(TaskErstellenBearbeiten.StatusTyp status)
@@ -189,67 +217,79 @@ namespace SystemAdministrationCenter
             return string.Empty;
         }
 
-        private void contextMenuStrip_LVTasks_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        private void contextMenuStrip_LVTasks_Opening(object sender, CancelEventArgs e)
         {
             ContextMenuStrip contextMenuStrip = (ContextMenuStrip)sender;
             int selectedIndex = -1;
-            try
+
+            if(listView_Tasks.SelectedItems.Count>0)
             {
                 selectedIndex = listView_Tasks.SelectedIndices[0];
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                bool enabled = (listView_Tasks.Items.Count > 0);
-                toolStripMenuItem_TaskBearbeiten.Enabled = enabled;
-                toolStripMenuItem_TaskLoeschen.Enabled = enabled;
+                //Wenn ein Element im ListView ausgewählt wurde
+                switch (listTasks[selectedIndex].StatusText)
+                {
+                    case TaskErstellenBearbeiten.StatusTyp.NochNichtAusgefuehrt:
+                    case TaskErstellenBearbeiten.StatusTyp.Beendet:
+                        AddContextMenuItem(contextMenuStrip, "TaskStart", "Task starten", toolStripMenuItem_TaskStart_Click);
+                        break;
+                    case TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt:
+                        AddContextMenuItem(contextMenuStrip, "TaskKill", "Task beenden", toolStripMenuItem_TaskKill_Click);
+                        break;
+                }
             }
 
-            //Wenn ein Element im ListView ausgewählt wurde
-            if(selectedIndex > -1)
-            {
-                contextMenuStrip.Items.Clear();
-                AddContextMenuItem(contextMenuStrip, "TaskStart", "Task starten", blub);
-                ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem();
-                toolStripMenuItem.Name = "toolStripMenuItem_Blub";
-                toolStripMenuItem.Text = "Blub";
-                toolStripMenuItem.Click += new EventHandler(blub);
-                contextMenuStrip.Items.Add(toolStripMenuItem);
-            }
-        }
+            AddContextSeparator(contextMenuStrip);
 
-        void blub(object sender, EventArgs e)
-        {
+            AddContextMenuItem(contextMenuStrip, "TaskBearbeiten", "Task bearbeiten", toolStripMenuItem_TaskBearbeiten_Click);
+            AddContextMenuItem(contextMenuStrip, "TaskLoeschen", "Task löschen", toolStripMenuItem_TaskLoeschen_Click);
 
+            bool enabled = (listView_Tasks.Items.Count > 0);
+            toolStripMenuItem_TaskBearbeiten.Enabled = enabled;
+            toolStripMenuItem_TaskLoeschen.Enabled = enabled;
         }
 
         private void contextMenuStrip_LVTasks_Closing(object sender, ToolStripDropDownClosingEventArgs e)
         {
             ContextMenuStrip contextMenuStrip = (ContextMenuStrip)sender;
-            RemoveContextMenuItem(contextMenuStrip, "toolStripMenuItem_Blub");
-            //try
-            //{
-            //    contextMenuStrip.Items.Remove(contextMenuStrip.Items.Find("toolStripMenuItem_Blub", true)[0]);
-            //}
-            //catch (IndexOutOfRangeException) { }
+            RemoveContextMenuItem(contextMenuStrip, "TaskStart");
+            RemoveContextMenuItem(contextMenuStrip, "TaskKill");
         }
 
         void AddContextMenuItem(ContextMenuStrip contextMenuStrip, string name, string text, EventHandler clickEventHandler)
         {
             ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem();
-            toolStripMenuItem.Name = string.Concat("toolStripMenuItem_", name);
+            toolStripMenuItem.Name = string.Concat("toolStripMenuItem_", name, "_Click");
             toolStripMenuItem.Text = text;
             toolStripMenuItem.Click += clickEventHandler;
             contextMenuStrip.Items.Add(toolStripMenuItem);
         }
 
+        void AddContextSeparator(ContextMenuStrip contextMenuStrip)
+        {
+            ToolStripSeparator toolStripSeparator = new ToolStripSeparator();
+            contextMenuStrip.Items.Add(toolStripSeparator);
+        }
+
         void RemoveContextMenuItem(ContextMenuStrip contextMenuStrip, string name)
         {
-            name = string.Concat("toolStripMenuItem_", name);
+            name = string.Concat("toolStripMenuItem_", name, "_Click");
             try
             {
                 contextMenuStrip.Items.Remove(contextMenuStrip.Items.Find(name, true)[0]);
             }
             catch (IndexOutOfRangeException) { }
+        }
+
+        void toolStripMenuItem_TaskStart_Click(object sender, EventArgs e)
+        {
+            int selectedIndex = listView_Tasks.SelectedIndices[0];
+            Run(listTasks[selectedIndex]);
+        }
+
+        void toolStripMenuItem_TaskKill_Click(object sender, EventArgs e)
+        {
+            int selectedIndex = listView_Tasks.SelectedIndices[0];
+            Kill(listLVItems[selectedIndex].Key);
         }
     }
 }

@@ -163,6 +163,8 @@ namespace SystemAdministrationCenter
 
             task.StatusText = TaskErstellenBearbeiten.StatusTyp.NochNichtAusgefuehrt;
             task.RunOnce = checkBox_RunOnce.Checked;
+            task.NoWindow = checkBox_NoWindow.Checked;
+            task.WindowStyle = (System.Diagnostics.ProcessWindowStyle)comboBox_WindowMode.SelectedIndex;
 
             this.Task = task;
 
@@ -206,12 +208,29 @@ namespace SystemAdministrationCenter
             button_Apply.Enabled = (textBox_TaskName.TextLength > 0 &&
                                     comboBox_Condition.SelectedIndex > -1 &&
                                     textBox_TaskName.ForeColor == Color.Black &&
-                                    fileName.Length > 0 && filePath.Length > 0);
+                                    fileName.Length > 0 && filePath.Length > 0 &&
+                                    (checkBox_NoWindow.Checked || comboBox_WindowMode.SelectedIndex > -1)
+                                    );
         }
 
         private void checkBox_NoWindow_CheckedChanged(object sender, EventArgs e)
         {
             comboBox_WindowMode.Enabled = !checkBox_NoWindow.Checked;
+            if(!checkBox_NoWindow.Checked)
+            {
+                comboBox_WindowMode.SelectedIndex = -1; //Nichts ausgewählt
+                SendMessage(this.comboBox_WindowMode.Handle, CB_SETCUEBANNER, 0, "Fenstermodus");
+            }
+            else
+            {
+                comboBox_WindowMode.SelectedIndex = 1; //Versteckt
+            }
+            ValidateFields();
+        }
+
+        private void comboBox_WindowMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ValidateFields();
         }
     }
 }
