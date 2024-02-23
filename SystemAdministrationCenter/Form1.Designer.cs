@@ -43,8 +43,6 @@
             this.columnHeader_Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip_LVTasks = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem_NeuenTask = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem_TaskBearbeiten = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem_TaskLoeschen = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.timerDateTime = new System.Windows.Forms.Timer(this.components);
             this.timer_Execution = new System.Windows.Forms.Timer(this.components);
@@ -154,11 +152,9 @@
             // contextMenuStrip_LVTasks
             // 
             this.contextMenuStrip_LVTasks.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem_NeuenTask,
-            this.toolStripMenuItem_TaskBearbeiten,
-            this.toolStripMenuItem_TaskLoeschen});
+            this.toolStripMenuItem_NeuenTask});
             this.contextMenuStrip_LVTasks.Name = "contextMenuStrip_LVTasks";
-            this.contextMenuStrip_LVTasks.Size = new System.Drawing.Size(182, 92);
+            this.contextMenuStrip_LVTasks.Size = new System.Drawing.Size(182, 48);
             this.contextMenuStrip_LVTasks.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.contextMenuStrip_LVTasks_Closing);
             this.contextMenuStrip_LVTasks.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip_LVTasks_Opening);
             // 
@@ -168,19 +164,6 @@
             this.toolStripMenuItem_NeuenTask.Size = new System.Drawing.Size(181, 22);
             this.toolStripMenuItem_NeuenTask.Text = "Neuen Task erstellen";
             this.toolStripMenuItem_NeuenTask.Click += new System.EventHandler(this.toolStripMenuItem_NeuenTask_Click);
-            // 
-            // toolStripMenuItem_TaskBearbeiten
-            // 
-            this.toolStripMenuItem_TaskBearbeiten.Name = "toolStripMenuItem_TaskBearbeiten";
-            this.toolStripMenuItem_TaskBearbeiten.Size = new System.Drawing.Size(181, 22);
-            this.toolStripMenuItem_TaskBearbeiten.Text = "Task bearbeiten";
-            this.toolStripMenuItem_TaskBearbeiten.Click += new System.EventHandler(this.toolStripMenuItem_TaskBearbeiten_Click);
-            // 
-            // toolStripMenuItem_TaskLoeschen
-            // 
-            this.toolStripMenuItem_TaskLoeschen.Name = "toolStripMenuItem_TaskLoeschen";
-            this.toolStripMenuItem_TaskLoeschen.Size = new System.Drawing.Size(181, 22);
-            this.toolStripMenuItem_TaskLoeschen.Text = "Task löschen";
             // 
             // tabPage2
             // 
@@ -247,8 +230,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader_Execution;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip_LVTasks;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_NeuenTask;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_TaskBearbeiten;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_TaskLoeschen;
         private System.Windows.Forms.ColumnHeader columnHeader_Status;
         private System.Windows.Forms.Timer timer_Execution;
     }

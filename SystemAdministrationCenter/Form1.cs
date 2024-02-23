@@ -47,50 +47,8 @@ namespace SystemAdministrationCenter
             toolStripStatusLabel_Time.Text = DateTime.Now.ToString();
             this.systemInformation.ComputerName = Environment.MachineName;
             this.systemInformation.UserName = Environment.UserName;
-            
-            int width = (listView_Tasks.Width / 4) - 1;
-            columnHeader_Name.Width = width;
-            columnHeader_Condition.Width = width;
-            columnHeader_Execution.Width = width;
-            columnHeader_Status.Width = width;
-        }
 
-        private void toolStripMenuItem_NeuenTask_Click(object sender, EventArgs e)
-        {
-            Form_TaskErstellenBearbeiten form = new Form_TaskErstellenBearbeiten();
-            TaskErstellenBearbeiten task;
-            DialogResult dialog = form.ShowDialog();
-            if (dialog == DialogResult.OK)
-            {
-                task = form.Task;
-                ListViewItem lvItem = CreateNewListViewItem(task);
-                listView_Tasks.Items.Add(lvItem);
-                UpdateListViewColumnWidth();
-
-                this.listLVItems.Add(new KeyValuePair<int, ListViewItem>(task.ID, lvItem));
-                this.listTasks.Add(task);
-            }
-        }
-
-        private void toolStripMenuItem_TaskBearbeiten_Click(object sender, EventArgs e)
-        {
-            int index = listView_Tasks.SelectedIndices[0]; //Angeklickte Item
-            TaskErstellenBearbeiten task = this.listTasks[index];
-            Form_TaskErstellenBearbeiten form = new Form_TaskErstellenBearbeiten(task);
-            DialogResult dialog = form.ShowDialog();
-            if(dialog == DialogResult.OK)
-            {
-                task = form.Task;
-                ListViewItem listViewItem = CreateNewListViewItem(task);
-                this.listTasks[index] = task;
-                this.listLVItems[index] = new KeyValuePair<int, ListViewItem>(index, listViewItem);
-                listView_Tasks.Items[index] = listViewItem;
-            }
-        }
-
-        void toolStripMenuItem_TaskLoeschen_Click(object sender, EventArgs e)
-        {
-            //TODO
+            UpdateListViewColumnWidth();
         }
 
         ListViewItem CreateNewListViewItem(TaskErstellenBearbeiten task)
@@ -208,41 +166,35 @@ namespace SystemAdministrationCenter
             return string.Empty;
         }
 
+        #region ContextMenu
+
         private void contextMenuStrip_LVTasks_Opening(object sender, CancelEventArgs e)
         {
             ContextMenuStrip contextMenuStrip = (ContextMenuStrip)sender;
             int selectedIndex = -1;
 
-            if(listView_Tasks.SelectedItems.Count>0)
+            if (listView_Tasks.SelectedItems.Count > 0)
             {
                 selectedIndex = listView_Tasks.SelectedIndices[0];
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                bool enabled = (listView_Tasks.Items.Count > 0);
-                toolStripMenuItem_TaskBearbeiten.Enabled = enabled;
-                toolStripMenuItem_TaskLoeschen.Enabled = enabled;
+                //Wenn ein Element im ListView ausgewählt wurde
+                switch (listTasks[selectedIndex].StatusText)
+                {
+                    case TaskErstellenBearbeiten.StatusTyp.NochNichtAusgefuehrt:
+                    case TaskErstellenBearbeiten.StatusTyp.Beendet:
+                        AddContextMenuItem(contextMenuStrip, "TaskStart", "Task starten", toolStripMenuItem_TaskStart_Click);
+                        break;
+                    case TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt:
+                        AddContextMenuItem(contextMenuStrip, "TaskKill", "Task beenden", toolStripMenuItem_TaskKill_Click);
+                        break;
+                }
+                AddContextSeparator(contextMenuStrip);
+                AddContextMenuItem(contextMenuStrip, "TaskBearbeiten", "Task bearbeiten", toolStripMenuItem_TaskBearbeiten_Click);
+                AddContextMenuItem(contextMenuStrip, "TaskLoeschen", "Task löschen", toolStripMenuItem_TaskLoeschen_Click);
             }
 
-            //Wenn ein Element im ListView ausgewählt wurde
-            if(selectedIndex > -1)
-            {
-                contextMenuStrip.Items.Clear();
-                AddContextMenuItem(contextMenuStrip, "TaskStart", "Task starten", blub);
-                ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem();
-                toolStripMenuItem.Name = "toolStripMenuItem_Blub";
-                toolStripMenuItem.Text = "Blub";
-                toolStripMenuItem.Click += new EventHandler(blub);
-                contextMenuStrip.Items.Add(toolStripMenuItem);
-            }
-        }
-
-        void blub(object sender, EventArgs e)
-        {
-
-            bool enabled = (listView_Tasks.Items.Count > 0);
-            toolStripMenuItem_TaskBearbeiten.Enabled = enabled;
-            toolStripMenuItem_TaskLoeschen.Enabled = enabled;
+            //bool enabled = (listView_Tasks.Items.Count > 0);
+            //toolStripMenuItem_TaskBearbeiten.Enabled = enabled;
+            //toolStripMenuItem_TaskLoeschen.Enabled = enabled;
         }
 
         private void contextMenuStrip_LVTasks_Closing(object sender, ToolStripDropDownClosingEventArgs e)
@@ -250,6 +202,8 @@ namespace SystemAdministrationCenter
             ContextMenuStrip contextMenuStrip = (ContextMenuStrip)sender;
             RemoveContextMenuItem(contextMenuStrip, "TaskStart");
             RemoveContextMenuItem(contextMenuStrip, "TaskKill");
+            RemoveContextMenuItem(contextMenuStrip, "TaskBearbeiten");
+            RemoveContextMenuItem(contextMenuStrip, "TaskLoeschen");
         }
 
         void AddContextMenuItem(ContextMenuStrip contextMenuStrip, string name, string text, EventHandler clickEventHandler)
@@ -261,12 +215,6 @@ namespace SystemAdministrationCenter
             contextMenuStrip.Items.Add(toolStripMenuItem);
         }
 
-        void AddContextSeparator(ContextMenuStrip contextMenuStrip)
-        {
-            ToolStripSeparator toolStripSeparator = new ToolStripSeparator();
-            contextMenuStrip.Items.Add(toolStripSeparator);
-        }
-
         void RemoveContextMenuItem(ContextMenuStrip contextMenuStrip, string name)
         {
             name = string.Concat("toolStripMenuItem_", name, "_Click");
@@ -276,5 +224,63 @@ namespace SystemAdministrationCenter
             }
             catch (IndexOutOfRangeException) { }
         }
+
+        void AddContextSeparator(ContextMenuStrip contextMenuStrip)
+        {
+            ToolStripSeparator toolStripSeparator = new ToolStripSeparator();
+            contextMenuStrip.Items.Add(toolStripSeparator);
+        }
+
+        private void toolStripMenuItem_NeuenTask_Click(object sender, EventArgs e)
+        {
+            Form_TaskErstellenBearbeiten form = new Form_TaskErstellenBearbeiten();
+            TaskErstellenBearbeiten task;
+            DialogResult dialog = form.ShowDialog();
+            if (dialog == DialogResult.OK)
+            {
+                task = form.Task;
+                ListViewItem lvItem = CreateNewListViewItem(task);
+                listView_Tasks.Items.Add(lvItem);
+                UpdateListViewColumnWidth();
+
+                this.listLVItems.Add(new KeyValuePair<int, ListViewItem>(task.ID, lvItem));
+                this.listTasks.Add(task);
+            }
+        }
+
+        void toolStripMenuItem_TaskStart_Click(object sender, EventArgs e)
+        {
+            int selectedIndex = listView_Tasks.SelectedIndices[0];
+            Run(listTasks[selectedIndex]);
+        }
+
+        void toolStripMenuItem_TaskKill_Click(object sender, EventArgs e)
+        {
+            int selectedIndex = listView_Tasks.SelectedIndices[0];
+            Kill(listLVItems[selectedIndex].Key);
+        }
+
+        private void toolStripMenuItem_TaskBearbeiten_Click(object sender, EventArgs e)
+        {
+            int index = listView_Tasks.SelectedIndices[0]; //Angeklickte Item
+            TaskErstellenBearbeiten task = this.listTasks[index];
+            Form_TaskErstellenBearbeiten form = new Form_TaskErstellenBearbeiten(task);
+            DialogResult dialog = form.ShowDialog();
+            if (dialog == DialogResult.OK)
+            {
+                task = form.Task;
+                ListViewItem listViewItem = CreateNewListViewItem(task);
+                this.listTasks[index] = task;
+                this.listLVItems[index] = new KeyValuePair<int, ListViewItem>(index, listViewItem);
+                listView_Tasks.Items[index] = listViewItem;
+            }
+        }
+
+        void toolStripMenuItem_TaskLoeschen_Click(object sender, EventArgs e)
+        {
+            //TODO
+        }
+
+        #endregion //ContextMenu
     }
 }
