@@ -100,6 +100,7 @@ namespace SystemAdministrationCenter
             CheckToRun();
         }
 
+        //Überprüft, welche Tasks ausgeführt werden müssen
         void CheckToRun()
         {
             if (listTasks.Count > 0)
@@ -118,6 +119,7 @@ namespace SystemAdministrationCenter
             }
         }
 
+        //Prüft die laufenden Tasks
         void CheckRunningProcess()
         {
             TaskErstellenBearbeiten task;
@@ -135,6 +137,7 @@ namespace SystemAdministrationCenter
             }
         }
 
+        //Task wird ausgeführt
         void Run(TaskErstellenBearbeiten task)
         {
             ProcessWorker processWorker = new ProcessWorker(task);
@@ -143,6 +146,7 @@ namespace SystemAdministrationCenter
             UpdateListViewItemStatus(listLVItems.FindIndex(x => x.Key == task.ID), TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt);
         }
 
+        //Beendet den Task
         void Kill(int taskID)
         {
             KeyValuePair<int, ProcessWorker> item = this.listProcess.Find(x => x.Key == taskID);
@@ -173,9 +177,12 @@ namespace SystemAdministrationCenter
             ContextMenuStrip contextMenuStrip = (ContextMenuStrip)sender;
             int selectedIndex = -1;
 
+            contextMenuStrip.Items.Clear();
+
             if (listView_Tasks.SelectedItems.Count > 0)
             {
                 selectedIndex = listView_Tasks.SelectedIndices[0];
+
                 //Wenn ein Element im ListView ausgewählt wurde
                 switch (listTasks[selectedIndex].StatusText)
                 {
@@ -192,18 +199,17 @@ namespace SystemAdministrationCenter
                 AddContextMenuItem(contextMenuStrip, "TaskLoeschen", "Task löschen", toolStripMenuItem_TaskLoeschen_Click);
             }
 
-            //bool enabled = (listView_Tasks.Items.Count > 0);
-            //toolStripMenuItem_TaskBearbeiten.Enabled = enabled;
-            //toolStripMenuItem_TaskLoeschen.Enabled = enabled;
+            if (contextMenuStrip.Items.Count == 0)
+            {
+                AddContextMenuItem(contextMenuStrip, "TaskErstellen", "Neuen Task erstellen", toolStripMenuItem_NeuenTask_Click);
+            }
+
+            e.Cancel = false;
         }
 
         private void contextMenuStrip_LVTasks_Closing(object sender, ToolStripDropDownClosingEventArgs e)
         {
-            ContextMenuStrip contextMenuStrip = (ContextMenuStrip)sender;
-            RemoveContextMenuItem(contextMenuStrip, "TaskStart");
-            RemoveContextMenuItem(contextMenuStrip, "TaskKill");
-            RemoveContextMenuItem(contextMenuStrip, "TaskBearbeiten");
-            RemoveContextMenuItem(contextMenuStrip, "TaskLoeschen");
+            
         }
 
         void AddContextMenuItem(ContextMenuStrip contextMenuStrip, string name, string text, EventHandler clickEventHandler)
@@ -218,17 +224,19 @@ namespace SystemAdministrationCenter
         void RemoveContextMenuItem(ContextMenuStrip contextMenuStrip, string name)
         {
             name = string.Concat("toolStripMenuItem_", name, "_Click");
-            try
-            {
-                contextMenuStrip.Items.Remove(contextMenuStrip.Items.Find(name, true)[0]);
-            }
-            catch (IndexOutOfRangeException) { }
+            contextMenuStrip.Items.RemoveByKey(name);
         }
 
         void AddContextSeparator(ContextMenuStrip contextMenuStrip)
         {
             ToolStripSeparator toolStripSeparator = new ToolStripSeparator();
+            toolStripSeparator.Name = "toolStripSeparator";
             contextMenuStrip.Items.Add(toolStripSeparator);
+        }
+
+        void RemoveContextSeparator(ContextMenuStrip contextMenuStrip)
+        {
+            contextMenuStrip.Items.Remove(new ToolStripSeparator());
         }
 
         private void toolStripMenuItem_NeuenTask_Click(object sender, EventArgs e)

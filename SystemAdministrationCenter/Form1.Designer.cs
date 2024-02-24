@@ -42,7 +42,6 @@
             this.columnHeader_Execution = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip_LVTasks = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.toolStripMenuItem_NeuenTask = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.timerDateTime = new System.Windows.Forms.Timer(this.components);
             this.timer_Execution = new System.Windows.Forms.Timer(this.components);
@@ -50,7 +49,6 @@
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage_Tasks.SuspendLayout();
-            this.contextMenuStrip_LVTasks.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -151,19 +149,10 @@
             // 
             // contextMenuStrip_LVTasks
             // 
-            this.contextMenuStrip_LVTasks.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem_NeuenTask});
             this.contextMenuStrip_LVTasks.Name = "contextMenuStrip_LVTasks";
-            this.contextMenuStrip_LVTasks.Size = new System.Drawing.Size(182, 48);
+            this.contextMenuStrip_LVTasks.Size = new System.Drawing.Size(61, 4);
             this.contextMenuStrip_LVTasks.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.contextMenuStrip_LVTasks_Closing);
             this.contextMenuStrip_LVTasks.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip_LVTasks_Opening);
-            // 
-            // toolStripMenuItem_NeuenTask
-            // 
-            this.toolStripMenuItem_NeuenTask.Name = "toolStripMenuItem_NeuenTask";
-            this.toolStripMenuItem_NeuenTask.Size = new System.Drawing.Size(181, 22);
-            this.toolStripMenuItem_NeuenTask.Text = "Neuen Task erstellen";
-            this.toolStripMenuItem_NeuenTask.Click += new System.EventHandler(this.toolStripMenuItem_NeuenTask_Click);
             // 
             // tabPage2
             // 
@@ -207,7 +196,6 @@
             this.statusStrip1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tabPage_Tasks.ResumeLayout(false);
-            this.contextMenuStrip_LVTasks.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -229,7 +217,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader_Condition;
         private System.Windows.Forms.ColumnHeader columnHeader_Execution;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip_LVTasks;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_NeuenTask;
         private System.Windows.Forms.ColumnHeader columnHeader_Status;
         private System.Windows.Forms.Timer timer_Execution;
     }
