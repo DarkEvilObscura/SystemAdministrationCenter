@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.dateiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -45,10 +46,13 @@
             this.tabPage_Printer = new System.Windows.Forms.TabPage();
             this.timerDateTime = new System.Windows.Forms.Timer(this.components);
             this.timer_Execution = new System.Windows.Forms.Timer(this.components);
+            this.listView_Printer = new System.Windows.Forms.ListView();
+            this.imageList_Printer = new System.Windows.Forms.ImageList(this.components);
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage_Tasks.SuspendLayout();
+            this.tabPage_Printer.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -157,6 +161,7 @@
             // 
             // tabPage_Printer
             // 
+            this.tabPage_Printer.Controls.Add(this.listView_Printer);
             this.tabPage_Printer.Location = new System.Drawing.Point(4, 22);
             this.tabPage_Printer.Name = "tabPage_Printer";
             this.tabPage_Printer.Padding = new System.Windows.Forms.Padding(3);
@@ -176,6 +181,23 @@
             this.timer_Execution.Enabled = true;
             this.timer_Execution.Interval = 1000;
             this.timer_Execution.Tick += new System.EventHandler(this.timer_Execution_Tick);
+            // 
+            // listView_Printer
+            // 
+            this.listView_Printer.HideSelection = false;
+            this.listView_Printer.LargeImageList = this.imageList_Printer;
+            this.listView_Printer.Location = new System.Drawing.Point(0, 0);
+            this.listView_Printer.Name = "listView_Printer";
+            this.listView_Printer.Size = new System.Drawing.Size(586, 204);
+            this.listView_Printer.TabIndex = 0;
+            this.listView_Printer.UseCompatibleStateImageBehavior = false;
+            // 
+            // imageList_Printer
+            // 
+            this.imageList_Printer.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList_Printer.ImageStream")));
+            this.imageList_Printer.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList_Printer.Images.SetKeyName(0, "default");
+            this.imageList_Printer.Images.SetKeyName(1, "normal");
             // 
             // Form1
             // 
@@ -197,6 +219,7 @@
             this.statusStrip1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tabPage_Tasks.ResumeLayout(false);
+            this.tabPage_Printer.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -220,6 +243,8 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip_LVTasks;
         private System.Windows.Forms.ColumnHeader columnHeader_Status;
         private System.Windows.Forms.Timer timer_Execution;
+        private System.Windows.Forms.ListView listView_Printer;
+        private System.Windows.Forms.ImageList imageList_Printer;
     }
 }
 

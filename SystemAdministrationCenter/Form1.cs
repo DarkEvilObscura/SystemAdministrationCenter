@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -293,9 +294,34 @@ namespace SystemAdministrationCenter
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(tabControl1.SelectedIndex == 1)
+            switch (tabControl1.SelectedIndex)
             {
-                Printer.GetPrinters();
+                //Tasks
+                case 0:
+                    break;
+
+                //Drucker
+                case 1:
+                    FillLVPrinter();
+                    break;
+            }
+        }
+
+        void FillLVPrinter()
+        {
+            listView_Printer.Items.Clear();
+            listView_Printer.LargeImageList = imageList_Printer;
+
+            ListViewItem printerItem;
+            //TKey: Druckername
+            //TValue: Standarddrucker ?
+            foreach (KeyValuePair<string, bool> item in Printer.ListPrinter)
+            {
+                printerItem = new ListViewItem();
+                printerItem.Text = item.Key;
+                printerItem.ImageIndex = (!item.Value) ? 1 : 0;
+
+                listView_Printer.Items.Add(printerItem);
             }
         }
     }

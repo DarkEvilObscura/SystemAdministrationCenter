@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Drawing.Printing;
 using System.Runtime.InteropServices;
 
@@ -11,12 +12,17 @@ namespace SystemAdministrationCenter
         [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern bool SetDefaultPrinter(string Printer);
 
+        //[DllImport("shell32.dll", EntryPoint = "ExtractIconExW", CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        //private static extern int ExtractIconEx(string file, int nIconIndex, out IntPtr phiconLarge, out IntPtr phiconSmall, int nIcons);
+
+        //public static int NumberOfIcons { get; private set; }
+
         //TKey: Druckername, TValue: Standarddrucker ?
-        static List<KeyValuePair<string, bool>> listPrinters;
+        public static List<KeyValuePair<string, bool>> ListPrinter { get; private set; }
 
         static Printer()
         {
-            listPrinters = new List<KeyValuePair<string, bool>>();
+            ListPrinter = new List<KeyValuePair<string, bool>>();
             GetPrinters();
         }
 
@@ -26,7 +32,8 @@ namespace SystemAdministrationCenter
             printDocument.PrinterSettings = new PrinterSettings();
             foreach (string item in PrinterSettings.InstalledPrinters)
             {
-                listPrinters.Add(new KeyValuePair<string, bool>(item, printDocument.PrinterSettings.IsDefaultPrinter));
+                printDocument.PrinterSettings.PrinterName = item;
+                ListPrinter.Add(new KeyValuePair<string, bool>(item, printDocument.PrinterSettings.IsDefaultPrinter));
             }
         }
 
@@ -34,5 +41,15 @@ namespace SystemAdministrationCenter
         {
             SetDefaultPrinter(printerName);
         }
+
+        //public static Icon GetPrinterIcon(int id, bool defaultPrinter)
+        //{
+        //    IntPtr largeIcon;
+
+        //    //81: std-printer, 16: normal printer
+        //    //NumberOfIcons = ExtractIconEx("imageres.dll", defaultPrinter ? 81 : 16, out largeIcon, out _, 1);
+        //    NumberOfIcons = ExtractIconEx("shell32.dll", 32, out largeIcon, out _, 1);
+        //    return Icon.FromHandle(largeIcon);
+        //}
     }
 }
