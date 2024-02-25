@@ -42,7 +42,7 @@
             this.columnHeader_Execution = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip_LVTasks = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabPage_Printer = new System.Windows.Forms.TabPage();
             this.timerDateTime = new System.Windows.Forms.Timer(this.components);
             this.timer_Execution = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1.SuspendLayout();
@@ -93,12 +93,13 @@
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage_Tasks);
-            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage_Printer);
             this.tabControl1.Location = new System.Drawing.Point(12, 67);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(594, 226);
             this.tabControl1.TabIndex = 2;
+            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
             // tabPage_Tasks
             // 
@@ -154,15 +155,15 @@
             this.contextMenuStrip_LVTasks.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.contextMenuStrip_LVTasks_Closing);
             this.contextMenuStrip_LVTasks.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip_LVTasks_Opening);
             // 
-            // tabPage2
+            // tabPage_Printer
             // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(586, 200);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "tabPage2";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.tabPage_Printer.Location = new System.Drawing.Point(4, 22);
+            this.tabPage_Printer.Name = "tabPage_Printer";
+            this.tabPage_Printer.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage_Printer.Size = new System.Drawing.Size(586, 200);
+            this.tabPage_Printer.TabIndex = 1;
+            this.tabPage_Printer.Text = "Drucker";
+            this.tabPage_Printer.UseVisualStyleBackColor = true;
             // 
             // timerDateTime
             // 
@@ -210,7 +211,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_Time;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage_Tasks;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tabPage_Printer;
         private System.Windows.Forms.Timer timerDateTime;
         private System.Windows.Forms.ListView listView_Tasks;
         private System.Windows.Forms.ColumnHeader columnHeader_Name;
