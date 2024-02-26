@@ -18,8 +18,15 @@ namespace SystemAdministrationCenter
 
         SystemInformation systemInformation = new SystemInformation();
 
+        //Beinhaltet eine Liste von Schlüssel-Werte-Paaren für die ListView:
+        //TKey: taskID, TValue: ListViewItem
         List<KeyValuePair<int, ListViewItem>> listLVItems = new List<KeyValuePair<int, ListViewItem>>();
+
+        //Beinhaltet die Liste von den erstellen Tasks
         List<TaskErstellenBearbeiten> listTasks = new List<TaskErstellenBearbeiten>();
+
+        //Beinhaltet eine Liste von Schlüssel-Werte-Paaren, für die ausführung von Tasks:
+        //TKey: taskID, TValue: Hintergrund-Thread mit dem ausgeführten Prozess
         List<KeyValuePair<int, ProcessWorker>> listProcess = new List<KeyValuePair<int, ProcessWorker>>();
 
         const int LV_LONGEST_ITEM = -1;
@@ -222,11 +229,11 @@ namespace SystemAdministrationCenter
             contextMenuStrip.Items.Add(toolStripMenuItem);
         }
 
-        void RemoveContextMenuItem(ContextMenuStrip contextMenuStrip, string name)
-        {
-            name = string.Concat("toolStripMenuItem_", name, "_Click");
-            contextMenuStrip.Items.RemoveByKey(name);
-        }
+        //void RemoveContextMenuItem(ContextMenuStrip contextMenuStrip, string name)
+        //{
+        //    name = string.Concat("toolStripMenuItem_", name, "_Click");
+        //    contextMenuStrip.Items.RemoveByKey(name);
+        //}
 
         void AddContextSeparator(ContextMenuStrip contextMenuStrip)
         {
@@ -287,7 +294,12 @@ namespace SystemAdministrationCenter
 
         void toolStripMenuItem_TaskLoeschen_Click(object sender, EventArgs e)
         {
-            //TODO
+            int index = listView_Tasks.SelectedIndices[0]; //Angeklickte Item
+            int taskID = listTasks[index].ID;
+
+            listTasks.Remove(listTasks.Find(x => x.ID == taskID));
+            listLVItems.Remove(listLVItems.Find(x => x.Key == taskID));
+            listView_Tasks.Items[index].Remove();
         }
 
         #endregion //ContextMenu
@@ -299,7 +311,6 @@ namespace SystemAdministrationCenter
                 //Tasks
                 case 0:
                     break;
-
                 //Drucker
                 case 1:
                     FillLVPrinter();
@@ -313,8 +324,8 @@ namespace SystemAdministrationCenter
             listView_Printer.LargeImageList = imageList_Printer;
 
             ListViewItem printerItem;
-            //TKey: Druckername
-            //TValue: Standarddrucker ?
+
+            //TKey: Druckername, TValue: Standarddrucker ?
             foreach (KeyValuePair<string, bool> item in Printer.ListPrinter)
             {
                 printerItem = new ListViewItem();
