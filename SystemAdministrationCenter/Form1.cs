@@ -16,8 +16,6 @@ namespace SystemAdministrationCenter
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern int SendMessage(IntPtr hWnd, int msg, int wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
 
-        SystemInformation systemInformation = new SystemInformation();
-
         //Beinhaltet eine Liste von Schlüssel-Werte-Paaren für die ListView:
         //TKey: taskID, TValue: ListViewItem
         List<KeyValuePair<int, ListViewItem>> listLVItems = new List<KeyValuePair<int, ListViewItem>>();
@@ -25,7 +23,7 @@ namespace SystemAdministrationCenter
         //Beinhaltet die Liste von den erstellen Tasks
         List<TaskErstellenBearbeiten> listTasks = new List<TaskErstellenBearbeiten>();
 
-        //Beinhaltet eine Liste von Schlüssel-Werte-Paaren, für die ausführung von Tasks:
+        //Beinhaltet eine Liste von Schlüssel-Werte-Paaren, für die Ausführung von Tasks:
         //TKey: taskID, TValue: Hintergrund-Thread mit dem ausgeführten Prozess
         List<KeyValuePair<int, ProcessWorker>> listProcess = new List<KeyValuePair<int, ProcessWorker>>();
 
@@ -33,6 +31,8 @@ namespace SystemAdministrationCenter
         const int LV_WIDTH_AUTOSIZE = -2;
 
         const int LV_COLUMN_STATUS = 3;
+
+        static TaskErstellenBearbeiten task;
 
         public Form1()
         {
@@ -53,10 +53,9 @@ namespace SystemAdministrationCenter
         {
             toolStripStatusLabel_UserNameComputerName.Text = string.Format("{0} ({1})", Environment.UserName, Environment.MachineName);
             toolStripStatusLabel_Time.Text = DateTime.Now.ToString();
-            this.systemInformation.ComputerName = Environment.MachineName;
-            this.systemInformation.UserName = Environment.UserName;
 
             UpdateListViewColumnWidth();
+            SystemInformation.Run();
         }
 
         ListViewItem CreateNewListViewItem(TaskErstellenBearbeiten task)
@@ -108,11 +107,21 @@ namespace SystemAdministrationCenter
             CheckToRun();
         }
 
+        private void timer_CheckRunningProcesses_Tick(object sender, EventArgs e)
+        {
+            CheckRunningProcess();
+        }
+
         //Überprüft, welche Tasks ausgeführt werden müssen
         void CheckToRun()
         {
             if (listTasks.Count > 0)
             {
+                if(!timer_CheckRunningProcesses.Enabled)
+                {
+                    timer_CheckRunningProcesses.Enabled = true;
+                    timer_CheckRunningProcesses.Start();
+                }
                 foreach (TaskErstellenBearbeiten item in listTasks)
                 {
                     if (item.TaskCondition == TaskErstellenBearbeiten.Condition.Uhrzeit &&
@@ -122,26 +131,53 @@ namespace SystemAdministrationCenter
                         Run(item);
                     }
                 }
-
-                CheckRunningProcess();
+            }
+            else
+            {
+                if (timer_CheckRunningProcesses.Enabled)
+                {
+                    timer_CheckRunningProcesses.Enabled = false;
+                    timer_CheckRunningProcesses.Stop();
+                }
             }
         }
 
         //Prüft die laufenden Tasks
         void CheckRunningProcess()
         {
-            TaskErstellenBearbeiten task;
-            int index = 0;
-            List<int> listIDs = new List<int>();
+            int index;
             foreach (KeyValuePair<int, ProcessWorker> item in this.listProcess)
             {
-                if (!item.Value.Running)
+                task = this.listTasks.Find(x => x.ID == item.Key);
+                if (task.StatusText == TaskErstellenBearbeiten.StatusTyp.Beendet)
                 {
-                    listIDs.Add(item.Key);
-                    task = (TaskErstellenBearbeiten)item.Value.CurrentObject;
-                    index = listLVItems.FindIndex(x => x.Key == task.ID);
-                    UpdateListViewItemStatus(index, TaskErstellenBearbeiten.StatusTyp.Beendet);
+                    if (item.Value.Running && item.Value.PID > 0)
+                    {
+                        task.StatusText = TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt;
+
+                        index = this.listLVItems.Find(x => x.Key == task.ID).Value.Index;
+                        UpdateListViewItemStatus(index, TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt);
+                    }
                 }
+
+                if (task.StatusText == TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt)
+                {   
+                    if(!item.Value.Running && item.Value.PID == 0)
+                    {
+                        task.StatusText = TaskErstellenBearbeiten.StatusTyp.Beendet;
+
+                        index = this.listLVItems.Find(x => x.Key == task.ID).Value.Index;
+                        UpdateListViewItemStatus(index, TaskErstellenBearbeiten.StatusTyp.Beendet);
+                    }
+                }
+
+                //if (!item.Value.Running)
+                //{
+                //    //listIDs.Add(item.Key);
+                //    task = (TaskErstellenBearbeiten)item.Value.CurrentObject;
+                //    index = listLVItems.FindIndex(x => x.Key == task.ID);
+                //    UpdateListViewItemStatus(index, TaskErstellenBearbeiten.StatusTyp.Beendet);
+                //}
             }
         }
 
@@ -149,17 +185,20 @@ namespace SystemAdministrationCenter
         void Run(TaskErstellenBearbeiten task)
         {
             ProcessWorker processWorker = new ProcessWorker(task);
-            processWorker.StartWorker();
             this.listProcess.Add(new KeyValuePair<int, ProcessWorker>(task.ID, processWorker));
+            task.StatusText = TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt;
             UpdateListViewItemStatus(listLVItems.FindIndex(x => x.Key == task.ID), TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt);
+
+            processWorker.StartWorker();
         }
 
         //Beendet den Task
         void Kill(int taskID)
         {
+            TaskErstellenBearbeiten task = listTasks.Find(x => x.ID == taskID);
             KeyValuePair<int, ProcessWorker> item = this.listProcess.Find(x => x.Key == taskID);
             item.Value.KillProcess();
-            this.listProcess.Remove(item);
+            task.StatusText = TaskErstellenBearbeiten.StatusTyp.Beendet;
             UpdateListViewItemStatus(listLVItems.FindIndex(x => x.Key == taskID), TaskErstellenBearbeiten.StatusTyp.Beendet);
         }
 
@@ -205,6 +244,9 @@ namespace SystemAdministrationCenter
                 AddContextSeparator(contextMenuStrip);
                 AddContextMenuItem(contextMenuStrip, "TaskBearbeiten", "Task bearbeiten", toolStripMenuItem_TaskBearbeiten_Click);
                 AddContextMenuItem(contextMenuStrip, "TaskLoeschen", "Task löschen", toolStripMenuItem_TaskLoeschen_Click);
+
+                //contextMenuStrip.Items.Find("TaskBearbeiten", true)[0].Enabled = false; //listTasks[selectedIndex].StatusText == TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt;
+                //contextMenuStrip.Items.Find("TaskLoeschen", true)[0].Enabled = listTasks[selectedIndex].StatusText == TaskErstellenBearbeiten.StatusTyp.WirdAusgefuehrt;
             }
 
             if (contextMenuStrip.Items.Count == 0)
@@ -213,11 +255,6 @@ namespace SystemAdministrationCenter
             }
 
             e.Cancel = false;
-        }
-
-        private void contextMenuStrip_LVTasks_Closing(object sender, ToolStripDropDownClosingEventArgs e)
-        {
-            
         }
 
         void AddContextMenuItem(ContextMenuStrip contextMenuStrip, string name, string text, EventHandler clickEventHandler)
@@ -229,22 +266,11 @@ namespace SystemAdministrationCenter
             contextMenuStrip.Items.Add(toolStripMenuItem);
         }
 
-        //void RemoveContextMenuItem(ContextMenuStrip contextMenuStrip, string name)
-        //{
-        //    name = string.Concat("toolStripMenuItem_", name, "_Click");
-        //    contextMenuStrip.Items.RemoveByKey(name);
-        //}
-
         void AddContextSeparator(ContextMenuStrip contextMenuStrip)
         {
             ToolStripSeparator toolStripSeparator = new ToolStripSeparator();
             toolStripSeparator.Name = "toolStripSeparator";
             contextMenuStrip.Items.Add(toolStripSeparator);
-        }
-
-        void RemoveContextSeparator(ContextMenuStrip contextMenuStrip)
-        {
-            contextMenuStrip.Items.Remove(new ToolStripSeparator());
         }
 
         private void toolStripMenuItem_NeuenTask_Click(object sender, EventArgs e)
@@ -288,7 +314,7 @@ namespace SystemAdministrationCenter
                 ListViewItem listViewItem = CreateNewListViewItem(task);
                 this.listTasks[index] = task;
                 this.listLVItems[index] = new KeyValuePair<int, ListViewItem>(index, listViewItem);
-                listView_Tasks.Items[index] = listViewItem;
+                this.listView_Tasks.Items[index] = listViewItem;
             }
         }
 
@@ -296,10 +322,17 @@ namespace SystemAdministrationCenter
         {
             int index = listView_Tasks.SelectedIndices[0]; //Angeklickte Item
             int taskID = listTasks[index].ID;
-
-            listTasks.Remove(listTasks.Find(x => x.ID == taskID));
-            listLVItems.Remove(listLVItems.Find(x => x.Key == taskID));
-            listView_Tasks.Items[index].Remove();
+            KeyValuePair<int, ProcessWorker> item = this.listProcess.Find(x => x.Key == taskID);
+            if (!item.Value.Running)
+            {
+                listLVItems.RemoveAt(index); //.Remove(listLVItems.Find(x => x.Key == taskID));
+                listView_Tasks.Items[index].Remove();
+                listTasks.Remove(listTasks.Find(x => x.ID == taskID));
+            }
+            else
+            {
+                MessageBox.Show("Der laufende Task kann nicht gelöscht werden.\nWarten Sie bis dieser abgeschlossen ist oder beenden Sie den Task manuell", "Task löschen nicht möglich", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         #endregion //ContextMenu
@@ -310,10 +343,19 @@ namespace SystemAdministrationCenter
             {
                 //Tasks
                 case 0:
+                    timer_CPUMemory.Stop();
                     break;
                 //Drucker
                 case 1:
+                    timer_CPUMemory.Stop();
                     FillLVPrinter();
+                    break;
+                case 2:
+                    //Systeminformationen
+                    label_MainboardVendor.Text = SystemInformation.MainboardVendor;
+                    label_MainboardModel.Text = SystemInformation.MainboardModel;
+                    label_OSName.Text = string.Format("{0} {1} ({2})", SystemInformation.OSName, SystemInformation.OSVersion, SystemInformation.OSArchitecture);
+                    timer_CPUMemory.Start();
                     break;
             }
         }
@@ -334,6 +376,20 @@ namespace SystemAdministrationCenter
 
                 listView_Printer.Items.Add(printerItem);
             }
+        }
+
+        private void timer_CPUMemory_Tick(object sender, EventArgs e)
+        {
+            int cpuUsage = SystemInformation.GetCPUUsage();
+            int freeMem = SystemInformation.GetFreeMemory();
+            int availMemTot = SystemInformation.MemoryTotal;
+            int usedMemory = availMemTot - freeMem;
+
+            label_CPUUsage.Text = string.Format("{0} %", cpuUsage.ToString());
+            label_MemoryUsage.Text = string.Format("{0} MB/{1} MB ({2} %) in Verwendung", usedMemory, availMemTot, (usedMemory * 100 / availMemTot));
+            label_MemoryAvailable.Text = string.Format("{0} MB/{1} MB ({2} %) Freier Speicher", freeMem, availMemTot, (freeMem * 100 / availMemTot));
+
+            progressBar_CPU.Value = cpuUsage;
         }
     }
 }

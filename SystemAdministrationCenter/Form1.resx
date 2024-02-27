@@ -134,7 +134,7 @@
         AAEAAAD/////AQAAAAAAAAAMAgAAAFdTeXN0ZW0uV2luZG93cy5Gb3JtcywgVmVyc2lvbj00LjAuMC4w
         LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkzNGUwODkFAQAAACZTeXN0
         ZW0uV2luZG93cy5Gb3Jtcy5JbWFnZUxpc3RTdHJlYW1lcgEAAAAERGF0YQcCAgAAAAkDAAAADwMAAAAQ
-        ZwAAAk1TRnQBSQFMAgEBAgEAAQgBAAEIAQABQAEAAUABAAT/ASEBAAj/AUIBTQE2BwABNgMAASgEAAEB
+        ZwAAAk1TRnQBSQFMAgEBAgEAASABAAEgAQABQAEAAUABAAT/ASEBAAj/AUIBTQE2BwABNgMAASgEAAEB
         AgABQAMAAQEBAAEgBwABAREApP8D/gH/A/4B/wP+Gf8D/gH/A/4B/wP+//8u//8A/wACAJj/A/4B/wP+
         Af8D/gX/AeEB6gHhAf8BlgG3AZUB/wF4AaIBdwH/AUsBgwFKAf8BSwGDAUoB/wFLAYMBSgH/AUsBgwFK
         Af8BeAGiAXcB/wGWAbcBlQH/AeEB6gHhBf8D/gH/A/4B/wP+//8i//8A/wACAJT/A/4B/wP+Af8B8AH1
@@ -581,5 +581,11 @@
   </metadata>
   <metadata name="timer_Execution.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>572, 17</value>
+  </metadata>
+  <metadata name="timer_CPUMemory.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>856, 17</value>
+  </metadata>
+  <metadata name="timer_CheckRunningProcesses.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>1011, 17</value>
   </metadata>
 </root>
